@@ -2,10 +2,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { ChevronUp, ChevronDown, Search, Filter } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { userList } from "@/redux/slices/task.slice";
-import { SearchField } from "./search";
-import { FilterField } from "./filter";
-
+import { tasksList } from "@/redux/slices/task.slice";
 
 // --- DataTable Component ---
 
@@ -23,6 +20,9 @@ export default function DataTable() {
     skip: 0,
     limit: 10,
   });
+  const [showAddModal,setShowAddModal] = React.useState(false)
+    const [newTask, setNewTask] = useState({ title: '', description: '', status: 'todo' });
+  
 
   const { users, isLoading } = useSelector((state) => state.user);
 
@@ -38,7 +38,7 @@ export default function DataTable() {
   React.useEffect(() => {
     console.log({ params });
 
-    dispatch(userList(params));
+    dispatch(tasksList(params));
   }, [params]);
 
   // Logic to handle sorting when a header is clicked
@@ -56,16 +56,6 @@ export default function DataTable() {
         direction: action,
       },
     }));
-  };
-
-  //   Render the sort icon next to the header
-  const renderSortIcon = (field) => {
-    if (params.sort.field !== field) return null;
-    return params.sort.direction === "asc" ? (
-      <ChevronUp className="ml-2 h-4 w-4" />
-    ) : (
-      <ChevronDown className="ml-2 h-4 w-4" />
-    );
   };
 
   //   Utility to get status color
@@ -91,9 +81,68 @@ export default function DataTable() {
 
         {/* --- Controls: Search & Filter --- */}
         <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
-          <SearchField params={params} setParams={setParams} />
+          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            {/* 🔍 Search Field */}
+            <div className="relative w-full md:w-64">
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={params.search || ""}
+                onChange={(e) =>
+                  setParams((prev) => ({
+                    ...prev,
+                    search: e.target.value,
+                  }))
+                }
+                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg 
+                 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                🔍
+              </span>
+            </div>
 
-          <FilterField params={params} setParams={setParams} />
+            {/* ⚙️ Sort / Filter Dropdown */}
+            <div className="relative w-full md:w-48">
+              <select
+                value={params.sort?.opt || ""}
+                onChange={(e) =>
+                  setParams((prev) => ({
+                    ...prev,
+                    sort: {
+                      ...prev.sort,
+                      opt: e.target.value,
+                    },
+                  }))
+                }
+                className="w-full pl-4 pr-8 py-2 border border-gray-300 rounded-lg 
+                 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value="">Sort By</option>
+                <option value="createdAt">Created Date</option>
+                <option value="name">Name</option>
+              </select>
+
+              {/* Asc / Desc Toggle */}
+              <select
+                value={params.sort?.dir || ""}
+                onChange={(e) =>
+                  setParams((prev) => ({
+                    ...prev,
+                    sort: {
+                      ...prev.sort,
+                      dir: e.target.value,
+                    },
+                  }))
+                }
+                className="absolute right-0 top-0 h-full px-2 border-l border-gray-300 rounded-r-lg
+                 bg-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="asc">ASC</option>
+                <option value="desc">DESC</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* --- Table --- */}
@@ -108,8 +157,7 @@ export default function DataTable() {
                   onClick={() => handleSort("name")}
                 >
                   <div className="flex items-center">
-                    Name
-                    {renderSortIcon("name")}
+                    Title
                   </div>
                 </th>
                 {/* 2. Email Header */}
@@ -117,7 +165,7 @@ export default function DataTable() {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Email
+                  Description
                 </th>
                 {/* 3. Created At Header */}
                 <th
@@ -127,7 +175,6 @@ export default function DataTable() {
                 >
                   <div className="flex items-center">
                     Created At
-                    {renderSortIcon("createdAt")}
                   </div>
                 </th>
                 {/* 4. Status Header */}
@@ -147,10 +194,10 @@ export default function DataTable() {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {item?.name}
+                      {item?.title}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {item?.email}
+                      {item?.description}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {item?.createdAt}
@@ -214,6 +261,72 @@ export default function DataTable() {
             </Button>
           </div>
         </div> */}
+
+              {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Add New Task</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Task Title
+                </label>
+                <input
+                  type="text"
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Enter task title"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  rows="3"
+                  placeholder="Enter task description"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  value={newTask.status}
+                  onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="todo">To Do</option>
+                  <option value="inprogress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddTask}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Add Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

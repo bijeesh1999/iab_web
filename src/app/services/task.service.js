@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/user`
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/task`
 
 console.log({url:API_BASE_URL});
 
