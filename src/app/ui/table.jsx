@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SearchField } from "./search";
 import { FilterField } from "./filter";
 import { tasksList } from "@/redux/slices/task.slice";
-
+import TaskFormModal from "../components/form";
 
 // Utility function for sorting
 
@@ -85,107 +85,109 @@ export default function DataTable() {
   };
 
   return (
-    <div className="p-4 md:p-8 w-full mx-auto bg-gray-50 min-h-screen">
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">
-          User Data Management
-        </h2>
+    <>
+      <div className="p-4 md:p-8 w-full mx-auto bg-gray-50 min-h-screen">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">
+            User Data Management
+          </h2>
+          <TaskFormModal />
 
-        {/* --- Controls: Search & Filter --- */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
-          <SearchField params={params} setParams={setParams} />
+          {/* --- Controls: Search & Filter --- */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
+            <SearchField params={params} setParams={setParams} />
 
-          <FilterField params={params} setParams={setParams} />
-        </div>
+            <FilterField params={params} setParams={setParams} />
+          </div>
 
-        {/* --- Table --- */}
-        <div className="overflow-x-auto border rounded-lg shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                {/* 1. Name Header */}
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center">
-                    Name
-                    {renderSortIcon("name")}
-                  </div>
-                </th>
-                {/* 2. Email Header */}
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Email
-                </th>
-                {/* 3. Created At Header */}
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => handleSort("createdAt")}
-                >
-                  <div className="flex items-center">
-                    Created At
-                    {renderSortIcon("createdAt")}
-                  </div>
-                </th>
-                {/* 4. Status Header */}
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.length > 0 ? (
-                users.map((item, index) => (
-                  <tr
-                    key={item?._id}
-                    className="hover:bg-gray-50 transition-colors"
+          {/* --- Table --- */}
+          <div className="overflow-x-auto border rounded-lg shadow-sm">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  {/* 1. Name Header */}
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort("name")}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {item?.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {item?.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {item?.createdAt}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${getStatusColor(
-                          item?.status
-                        )}`}
-                      >
-                        {item?.status || "--"}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td
-                      colSpan="4"
-                      className="px-6 py-8 text-center text-gray-500 text-base"
+                    <div className="flex items-center">
+                      Name
+                      {renderSortIcon("name")}
+                    </div>
+                  </th>
+                  {/* 2. Email Header */}
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Email
+                  </th>
+                  {/* 3. Created At Header */}
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    <div className="flex items-center">
+                      Created At
+                      {renderSortIcon("createdAt")}
+                    </div>
+                  </th>
+                  {/* 4. Status Header */}
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {users.length > 0 ? (
+                  users.map((item, index) => (
+                    <tr
+                      key={item?._id}
+                      className="hover:bg-gray-50 transition-colors"
                     >
-                      No results found for your search criteria.
-                    </td>
-                  </tr>
-                </>
-              )}
-            </tbody>
-          </table>
-        </div>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {item?.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {item?.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item?.createdAt}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${getStatusColor(
+                            item?.status
+                          )}`}
+                        >
+                          {item?.status || "--"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <>
+                    <tr className="hover:bg-gray-50 transition-colors">
+                      <td
+                        colSpan="4"
+                        className="px-6 py-8 text-center text-gray-500 text-base"
+                      >
+                        No results found for your search criteria.
+                      </td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-        {/* --- Pagination Controls --- */}
-        {/* <div className="flex flex-col md:flex-row items-center justify-between mt-6 p-4 bg-gray-50 rounded-lg border">
+          {/* --- Pagination Controls --- */}
+          {/* <div className="flex flex-col md:flex-row items-center justify-between mt-6 p-4 bg-gray-50 rounded-lg border">
           <div className="text-sm text-gray-600 mb-4 md:mb-0">
             Showing {totalItems === 0 ? 0 : startIndex + 1} to{" "}
             {Math.min(endIndex, totalItems)} of {totalItems} entries
@@ -216,7 +218,8 @@ export default function DataTable() {
             </Button>
           </div>
         </div> */}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
